@@ -1,2 +1,3 @@
-# p2diff
-P2 Diff Tool
+# P2 Diff Tool
+
+A tool for generating a diff overview of 2 update sites

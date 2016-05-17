@@ -1,7 +1,5 @@
 package org.apodhrad.p2diff;
-
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
@@ -35,15 +33,15 @@ public class DiffManager {
 	private List<String> revisedLines;
 	
 	/**
-	 * Name of the tag which wraps the lines of a diff
+	 * Wrapping tag name
 	 */
 	private String tag = "span";
 	
 	private List<String> unifiedDiff;
-	private String title = "Diff View";
-	private String cssPath = "css/style.css";
 	
 	private Configuration cfg;
+	private String title = "Diff View";
+	private String cssPath = "css/style.css";
 	
 	/**
 	 * Assign paths and load files
@@ -62,7 +60,7 @@ public class DiffManager {
 	}
 	
 	/**
-	 * Converts diff format to HTML
+	 * Převede Convert Diff to HTML
 	 * @param unifiedDiff
 	 * @return
 	 */
@@ -85,8 +83,8 @@ public class DiffManager {
 	}
 	
 	/**
-	 * Generates TAG
-	 * @param className Name of a CSS class
+	 * Generate tag
+	 * @param className Name of CSS class
 	 * @param content Tag content
 	 * @return
 	 */
@@ -105,35 +103,36 @@ public class DiffManager {
 	{
 		Patch patch = DiffUtils.diff(originalLines, revisedLines);
 		unifiedDiff = DiffUtils.generateUnifiedDiff(originalPath, revisedPath, originalLines, patch, 1);
-		List<String> htmlDiff = new ArrayList<String>();
 		
+		List<String> htmlDiff = new ArrayList<String>();
 		for (String line : unifiedDiff) {
 			htmlDiff.add(this.convertToHTML(line));
 		}
 		
-		configurateTemplate();
+		configurateTemplateSystem();
+		
+		Template temp = cfg.getTemplate("layout.html");
+		
 		Map<String, Object> root = new HashMap<String, Object>();
 		root.put("title", title);
-		root.put("diff", htmlDiff);
 		root.put("cssPath", cssPath);
+		root.put("diff", htmlDiff);
 		
-		Template tmp = cfg.getTemplate("layout.html");
+		StringWriter sw = new StringWriter();
+		temp.process(root, sw);
 		
-		StringWriter out = new StringWriter();
-    	tmp.process(root, out);
-    	
-		return out.toString();
+		return sw.toString();
 	}
 	
 	public URL getResource(String path) {
 		return DiffManager.class.getClassLoader().getResource(path);
 	}
 	
-	private void configurateTemplate() throws IOException
+	private void configurateTemplateSystem() throws IOException
 	{
 		cfg = new Configuration(Configuration.VERSION_2_3_22);
-		cfg.setDirectoryForTemplateLoading(new File(getResource("").getFile()));
 		cfg.setDefaultEncoding("UTF-8");
+		cfg.setDirectoryForTemplateLoading(new File(getResource(".").getFile()));
 	}
 	
 	//// SETTERS AND GETTERS
@@ -141,16 +140,6 @@ public class DiffManager {
 	public void setTag(String tag)
 	{
 		this.tag = tag; 
-	}
-	
-	public void setTitle(String title) 
-	{
-		this.title = title;
-	}
-	
-	public void setCssPath(String cssPath) 
-	{
-		this.cssPath = cssPath;
 	}
 	
 	public String getTag()

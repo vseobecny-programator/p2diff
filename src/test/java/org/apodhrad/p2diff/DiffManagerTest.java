@@ -16,13 +16,13 @@ public class DiffManagerTest {
 	private DiffManager dm;
 	
 	@Test
-	public void generatHTMLTest() throws Exception
+	public void generateHTMLTest() throws Exception
 	{
 		dm = new DiffManager("lorem.txt", "lorem2.txt");
 		dm.setTag("p");
 		
 		String html = dm.generate();
-		ArrayList<String> htmlLines = new ArrayList();
+		ArrayList<String> htmlLines = new ArrayList<String>();
 		htmlLines.add(html);
 		
 		FileUtils.writeLines(new File("target/diff.html"), htmlLines);

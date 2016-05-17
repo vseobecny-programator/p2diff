@@ -1,25 +1,33 @@
 package org.apodhrad.p2diff;
+
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.*;
 
 import difflib.DiffUtils;
 import difflib.Patch;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 public class DiffManager {
 	
 	/**
-	 * Cesta k původnímu souboru
+	 * Path to the original file
 	 */
 	private String originalPath;
 	
 	/**
-	 * Cesta k upravenému souboru
+	 * Path to the revised file
 	 */
 	private String revisedPath;
 	
@@ -27,16 +35,18 @@ public class DiffManager {
 	private List<String> revisedLines;
 	
 	/**
-	 * Jméno tagu, kterým se budou obalovat řádky
+	 * Name of the tag which wraps the lines of a diff
 	 */
 	private String tag = "span";
 	
 	private List<String> unifiedDiff;
-	private String headerPath = "target/header.html";
-	private String footerPath = "target/footer.html";
+	private String title = "Diff View";
+	private String cssPath = "css/style.css";
+	
+	private Configuration cfg;
 	
 	/**
-	 * Přiřaď cesty a načti soubory
+	 * Assign paths and load files
 	 * @param originalPath
 	 * @param revisedPath
 	 * @throws IOException
@@ -52,7 +62,7 @@ public class DiffManager {
 	}
 	
 	/**
-	 * Převede Diff formát do HTML
+	 * Converts diff format to HTML
 	 * @param unifiedDiff
 	 * @return
 	 */
@@ -75,9 +85,9 @@ public class DiffManager {
 	}
 	
 	/**
-	 * Vygeneruj tag
-	 * @param className Název CSS třídy
-	 * @param content Obsah tagu
+	 * Generates TAG
+	 * @param className Name of a CSS class
+	 * @param content Tag content
 	 * @return
 	 */
 	private String generateTag(String className, String content)
@@ -86,54 +96,61 @@ public class DiffManager {
 	}
 	
 	/**
-	 * Vygeneruj HTML soubor
+	 * Generate HTML file
 	 * @return
 	 * @throws IOException 
 	 * @throws TemplateException 
 	 */
-	public List<String> generate() throws IOException
+	public String generate() throws IOException, TemplateException
 	{
 		Patch patch = DiffUtils.diff(originalLines, revisedLines);
 		unifiedDiff = DiffUtils.generateUnifiedDiff(originalPath, revisedPath, originalLines, patch, 1);
 		List<String> htmlDiff = new ArrayList<String>();
 		
-		File header = new File(headerPath);
-		htmlDiff.addAll(FileUtils.readLines(header));
-		
 		for (String line : unifiedDiff) {
 			htmlDiff.add(this.convertToHTML(line));
 		}
 		
-		File footer = new File(footerPath);
-		htmlDiff.addAll(FileUtils.readLines(footer));
+		configurateTemplate();
+		Map<String, Object> root = new HashMap<String, Object>();
+		root.put("title", title);
+		root.put("diff", htmlDiff);
+		root.put("cssPath", cssPath);
 		
-		return htmlDiff;
+		Template tmp = cfg.getTemplate("layout.html");
+		
+		StringWriter out = new StringWriter();
+    	tmp.process(root, out);
+    	
+		return out.toString();
 	}
 	
-	/**
-	 * Získej zdroj
-	 * @param path Cesta k souboru
-	 * @return
-	 */
 	public URL getResource(String path) {
 		return DiffManager.class.getClassLoader().getResource(path);
 	}
 	
-	//// SETTERY A GETTERY
+	private void configurateTemplate() throws IOException
+	{
+		cfg = new Configuration(Configuration.VERSION_2_3_22);
+		cfg.setDirectoryForTemplateLoading(new File(getResource("").getFile()));
+		cfg.setDefaultEncoding("UTF-8");
+	}
+	
+	//// SETTERS AND GETTERS
 	
 	public void setTag(String tag)
 	{
 		this.tag = tag; 
 	}
 	
-	public void setHeader(String headerPath)
+	public void setTitle(String title) 
 	{
-		this.headerPath = headerPath;
+		this.title = title;
 	}
 	
-	public void setFooter(String footerPath)
+	public void setCssPath(String cssPath) 
 	{
-		this.footerPath = footerPath;
+		this.cssPath = cssPath;
 	}
 	
 	public String getTag()

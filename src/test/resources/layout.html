@@ -1,13 +1,3 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>${title)</title>
-		<meta charset="utf-8">
-		
-		<link href="${cssPath}" rel="stylesheet" type="text/css">
-	</head>
-	
-	<body>
-		${diff}
-	</body>
-</html>
+<#list diff as line>
+	${line}
+</#list>

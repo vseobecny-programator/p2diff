@@ -11,14 +11,15 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DiffManagerTest {
+public class DiffForFileTest {
 	
-	private DiffManager dm;
+	private DiffForFile dm;
 	
 	@Test
 	public void generateHTMLTest() throws Exception
 	{
-		dm = new DiffManager("lorem.txt", "lorem2.txt");
+		//System.out.println(Resource.getResource("lorem.txt").getFile());
+		dm = new DiffForFile(Resource.getResource("lorem.txt").getFile(), Resource.getResource("lorem2.txt").getFile());
 		dm.setTag("p");
 		
 		String html = dm.generate();
@@ -30,7 +31,7 @@ public class DiffManagerTest {
 	
 	private String readFileByBytes(String path) throws IOException
 	{
-		byte[] bytes = Files.readAllBytes(Paths.get(dm.getResource(path).getPath()));
+		byte[] bytes = Files.readAllBytes(Paths.get(Resource.getResource(path).getPath()));
 		return new String(bytes);
 	}
 }

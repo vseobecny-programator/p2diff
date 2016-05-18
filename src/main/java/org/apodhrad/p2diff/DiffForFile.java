@@ -11,13 +11,14 @@ import java.util.Map;
 
 import org.apache.commons.io.*;
 
+import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-public class DiffManager {
+public class DiffForFile {
 	
 	/**
 	 * Path to the original file
@@ -43,6 +44,8 @@ public class DiffManager {
 	private String title = "Diff View";
 	private String cssPath = "css/style.css";
 	
+	static final String NO_CHANGE = "";
+	
 	/**
 	 * Assign paths and load files
 	 * @param originalPath
@@ -50,13 +53,15 @@ public class DiffManager {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	DiffManager(String originalPath, String revisedPath) throws IOException, URISyntaxException
+	DiffForFile(String originalPath, String revisedPath) throws IOException, URISyntaxException
 	{
-		URL originalResource = getResource(originalPath);
-		URL revisedResource = getResource(revisedPath); 
+		this.originalPath = originalPath;
+		this.revisedPath = revisedPath; 
 		
-		originalLines = FileUtils.readLines(new File(originalResource.getFile()));
-		revisedLines = FileUtils.readLines(new File(revisedResource.getFile()));
+		originalLines = FileUtils.readLines(new File(originalPath));
+		revisedLines = FileUtils.readLines(new File(revisedPath));
+		
+		//System.out.println(originalPath);
 	}
 	
 	/**
@@ -96,43 +101,44 @@ public class DiffManager {
 	/**
 	 * Generate HTML file
 	 * @return
-	 * @throws IOException 
-	 * @throws TemplateException 
+	 * @throws Exception 
 	 */
-	public String generate() throws IOException, TemplateException
+	public String generate() throws Exception
 	{
 		Patch patch = DiffUtils.diff(originalLines, revisedLines);
-		unifiedDiff = DiffUtils.generateUnifiedDiff(originalPath, revisedPath, originalLines, patch, 1);
 		
-		List<String> htmlDiff = new ArrayList<String>();
-		for (String line : unifiedDiff) {
-			htmlDiff.add(this.convertToHTML(line));
+		if (!originalLines.equals(revisedLines)) {
+		
+			unifiedDiff = DiffUtils.generateUnifiedDiff(originalPath, revisedPath, originalLines, patch, 1);
+			
+			List<String> htmlDiff = new ArrayList<String>();
+			for (String line : unifiedDiff) {
+				htmlDiff.add(this.convertToHTML(line));
+			}
+			
+			configurateTemplateSystem();
+			
+			Template temp = cfg.getTemplate("layout.html");
+			
+			Map<String, Object> root = new HashMap<String, Object>();
+			root.put("title", title);
+			root.put("cssPath", cssPath);
+			root.put("diff", htmlDiff);
+			
+			StringWriter sw = new StringWriter();
+			temp.process(root, sw);
+			
+			return sw.toString();
 		}
 		
-		configurateTemplateSystem();
-		
-		Template temp = cfg.getTemplate("layout.html");
-		
-		Map<String, Object> root = new HashMap<String, Object>();
-		root.put("title", title);
-		root.put("cssPath", cssPath);
-		root.put("diff", htmlDiff);
-		
-		StringWriter sw = new StringWriter();
-		temp.process(root, sw);
-		
-		return sw.toString();
-	}
-	
-	public URL getResource(String path) {
-		return DiffManager.class.getClassLoader().getResource(path);
+		return DiffForFile.NO_CHANGE;
 	}
 	
 	private void configurateTemplateSystem() throws IOException
 	{
 		cfg = new Configuration(Configuration.VERSION_2_3_22);
 		cfg.setDefaultEncoding("UTF-8");
-		cfg.setDirectoryForTemplateLoading(new File(getResource(".").getFile()));
+		cfg.setDirectoryForTemplateLoading(new File(Resource.getResource(".").getFile()));
 	}
 	
 	//// SETTERS AND GETTERS

@@ -41,8 +41,7 @@ public class DiffForFile {
 	private List<String> unifiedDiff;
 	
 	private Configuration cfg;
-	private String title = "Diff View";
-	private String cssPath = "css/style.css";
+	public String template = "hidden.html";
 	
 	static final String NO_CHANGE = "";
 	
@@ -118,11 +117,9 @@ public class DiffForFile {
 			
 			configurateTemplateSystem();
 			
-			Template temp = cfg.getTemplate("layout.html");
+			Template temp = cfg.getTemplate(this.template);
 			
 			Map<String, Object> root = new HashMap<String, Object>();
-			root.put("title", title);
-			root.put("cssPath", cssPath);
 			root.put("diff", htmlDiff);
 			
 			StringWriter sw = new StringWriter();

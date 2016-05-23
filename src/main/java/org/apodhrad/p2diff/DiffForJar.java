@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apodhrad.jdownload.manager.util.UnpackUtils;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -56,31 +58,11 @@ public class DiffForJar {
 	 */
 	private ArrayList<File> extractJar(String dest, String jar) throws IOException
 	{
-		UnzipJar uj = new UnzipJar(dest, jar);
+		//UnzipJar uj = new UnzipJar(new File(dest).getPath(), jar);
+		UnpackUtils.unpack(jar, dest);
 		ArrayList<File> store = new ArrayList<File>();
-		listf(new File(dest).getAbsolutePath(), store);
-		
+		Resource.listf(new File(dest).getAbsolutePath(), store);
 		return store;
-	}
-	
-	/**
-	 * Get list of files from a folder and its sub-folders
-	 * @param directoryName
-	 * @param store
-	 */
-	public void listf(String directoryName, ArrayList<File> store) {
-	    File directory = new File(directoryName);
-
-	    // get all the files from a directory
-	    File[] fList = directory.listFiles();
-	    for (File file : fList) {
-	        if (file.isFile()) {
-	            store.add(file);
-	        } else if (file.isDirectory()) {
-	        	store.add(file);
-	            listf(file.getPath(), store);
-	        }
-	    }
 	}
 	
 	private Map convertArrayToMap(Object[] array) {
@@ -102,19 +84,21 @@ public class DiffForJar {
 		for (int i=0; i < files1.size(); i++) {
 			for (int y = 0; y < files2.size(); y++) {
 				if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
-					if (files1.get(i).isDirectory() && files2.get(y).isDirectory()) {
+					if (files1.get(i).isDirectory() || files2.get(y).isDirectory()) {
 						if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
 							diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
 						}
 					} else {
-						DiffForFile dff = new DiffForFile(files1.get(i).getAbsolutePath(), files2.get(y).getAbsolutePath());
-						dff.setTag("span");
-						String generated = dff.generate();
-						
+						System.out.println(files1.get(i) + " - " + files2.get(y));
+						//DiffForFile dff = new DiffForFile(files1.get(i).getAbsolutePath(), files2.get(y).getAbsolutePath());
+						//dff.setTag("span");
+						//String generated = dff.generate();
+						String generated = "";
 						if (generated.equals(DiffForFile.NO_CHANGE))
 							diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
 						else
-							diff.put(getName(files1.get(i), originalResource), dff.generate());
+							//diff.put(getName(files1.get(i), originalResource), dff.generate());
+							diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
 					}
 				}
 			}
@@ -132,46 +116,9 @@ public class DiffForJar {
 		return diff;
 	}
 	
-	public String generateHTML() throws IOException, TemplateException
+	public String generateHTML(String template) throws IOException, TemplateException
 	{
-		configurateTemplateSystem();
-		convertToHTML(diff);
-		Template temp = cfg.getTemplate(template);
-
-		Map<String, Object> root = new HashMap<String, Object>();
-		root.put("diff", htmlDiff);
-		
-		StringWriter sw = new StringWriter();
-		temp.process(root, sw);
-		
-		return sw.toString();
-	}
-	
-	private void convertToHTML(Map<String, Object> diff)
-	{		
-		htmlDiff = "<table>";
-		diff.forEach((key, value) -> {
-			if (value.equals(0))
-				htmlDiff += "<tr class=\"same\"><td>" + key + "</td><td>Hasn't changed</td></tr>\n";
-			else if (value.equals(1))
-				htmlDiff += "<tr class=\"deleted\"><td>" + key + "</td></tr>\n";
-			else if (value.equals(2))
-				htmlDiff += "<tr class=\"added\"><td>" + key + "</td></tr>\n";
-			else {
-				htmlDiff += "<tr class=\"same\"><td>" + key + "</td>\n";
-				htmlDiff += "<td id=\""+ key +"-toggle\">show</td></tr>";
-				htmlDiff += "<tr><td class=\"hidden\"><div id=\""+ key + "-hidden\">\n";
-				htmlDiff += value;
-				htmlDiff += "</div></td></tr>\n";
-			}
-		});
-		htmlDiff += "</table>";
-	}
-	
-	private void configurateTemplateSystem() throws IOException
-	{
-		cfg = new Configuration(Configuration.VERSION_2_3_22);
-		cfg.setDefaultEncoding("UTF-8");
-		cfg.setDirectoryForTemplateLoading(new File(Resource.getResource(".").getFile()));
+		HTMLGenerator generator = new HTMLGenerator(diff);
+		return generator.generateHTML(template + ".html");
 	}
 }

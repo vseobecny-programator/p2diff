@@ -8,6 +8,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.commons.io.IOUtils;
+
 public class UnzipJar {
  
 	UnzipJar(String destination, String jarPath) throws IOException {
@@ -17,6 +19,8 @@ public class UnzipJar {
 	public static void unzipJar(String destinationDir, String jarPath) throws IOException {
 		File file = new File(jarPath);
 		JarFile jar = new JarFile(file);
+		File dest = new File(destinationDir);
+		dest.mkdir();
  
 		// fist get all directories,
 		// then make those directory on the destination Path

@@ -15,45 +15,31 @@ public class HTMLGenerator {
 	private Map<String, Object> diff = new HashMap<String, Object>();
 	private Configuration cfg;
 	private String htmlDiff;
+	private String filename;
 	
-	HTMLGenerator(Map<String, Object> diff) {
+	HTMLGenerator(Map<String, Object> diff)
+	{
+		this(diff, "");
+	}
+	
+	HTMLGenerator(Map<String, Object> diff, String filename) {
+		this.filename = filename;
 		this.diff = diff;
 	}
 	public String generateHTML(String template) throws IOException, TemplateException
 	{
 		configurateTemplateSystem();
-		convertToHTML(diff);
 		Template temp = cfg.getTemplate(template);
 
 		Map<String, Object> root = new HashMap<String, Object>();
-		root.put("diff", htmlDiff);
+		
+		root.put("filename", filename);
+		root.put("diff", diff);
 		
 		StringWriter sw = new StringWriter();
 		temp.process(root, sw);
 		
 		return sw.toString();
-	}
-	
-	private void convertToHTML(Map<String, Object> diff)
-	{		
-		htmlDiff = "<table>";
-		diff.forEach((key, value) -> {
-			if (value.equals(DiffManager.SAME))
-				htmlDiff += "<tr class=\"same\"><td>" + key + "</td></tr>\n";
-			else if (value.equals(DiffManager.DELETED))
-				htmlDiff += "<tr class=\"deleted\"><td>" + key + "</td></tr>\n";
-			else if (value.equals(DiffManager.ADDED))
-				htmlDiff += "<tr class=\"added\"><td>" + key + "</td></tr>\n";
-			else if (value.equals(DiffManager.RENAMED))
-				htmlDiff += "<tr class=\"renamed\"><td>" + key + "</td></tr>\n";
-			else {
-				htmlDiff += "<tr class=\"same\"><td>" + key + "</td></tr>\n";
-				htmlDiff += "<tr><td class=\"hidden\"><pre id=\""+ key + "-hidden\">\n";
-				htmlDiff += value;
-				htmlDiff += "</pre></td></tr>\n";
-			}
-		});
-		htmlDiff += "</table>";
 	}
 	
 	private void configurateTemplateSystem() throws IOException

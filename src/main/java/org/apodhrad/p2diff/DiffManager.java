@@ -17,17 +17,20 @@ public class DiffManager {
 	
 	private File zip1;
 	private File zip2;
+	private String filter;
 	private Map<String, Object> diff = new HashMap<String, Object>();
-	
-	public final static int SAME = 0;
-	public final static int DELETED = 1;
-	public final static int ADDED = 2;
-	public final static int RENAMED = 3;
+	private Map<File, File> prepared = new HashMap<File, File>();
 	
 	DiffManager(File zip1, File zip2)
 	{
+		this(zip1, zip2, "(.*)");
+	}
+	
+	DiffManager(File zip1, File zip2, String filter)
+	{
 		this.zip1 = zip1;
 		this.zip2 = zip2;
+		this.filter = filter;
 	}
 	
 	private String getPath(String path, File resource)
@@ -54,37 +57,52 @@ public class DiffManager {
 
 		for (File file1 : filesInZip1) {
 			for (File file2 : filesInZip2) {
-				
-				if (file1.getName().equals(file2.getName())) {
-					if (compare(file1, file2)) {
+				System.out.println(file1.getName() + " - " + zip1.getName());
+				if (!(file1.getName().equals(zip1.getName()) || file2.getName().equals(zip2.getName()))) {
+					if (!(file1.isDirectory() || file2.isDirectory())) {
+						if (file1.getName().equals(file2.getName())) {
+							if (compare(file1, file2)) {
+								if (getPath(file1.getPath(), zip1).equals(getPath(file2.getPath(), zip2))) {
+									diff.put(getPath(file1.getPath(), zip1), Status.SAME);
+								} else
+									diff.put(getPath(file1.getPath(), zip1), Status.RENAMED);
+							}
+						}
 						
-						if (getPath(file1.getPath(), zip1).equals(getPath(file2.getPath(), zip2))) {
-							diff.put(getPath(file1.getPath(), zip1), SAME);
-						} else
-							diff.put(getPath(file1.getPath(), zip1), RENAMED);
+					    if ((FilenameUtils.getExtension(file1.getPath()).equals("jar")) && (FilenameUtils.getExtension(file2.getPath()).equals("jar"))) {
+							String[] onlyNameF1 = getPath(file1.getPath(), zip1).split("_");
+							String[] onlyNameF2 = getPath(file2.getPath(), zip2).split("_");
+							
+							if (onlyNameF1[0].equals(onlyNameF2[0])) {
+								if (file1.getName().matches(filter)) {
+									prepared.put(file1, file2);
+									diff.put(getPath(file1.getPath(), zip1), Status.PREPARED);
+								} else {
+									diff.put(getPath(file1.getPath(), zip1), Status.SAME);
+								}
+							}
+					    }
 					}
 				}
-				
-			    if ((FilenameUtils.getExtension(file1.getPath()).equals("jar")) && (FilenameUtils.getExtension(file2.getPath()).equals("jar"))) {
-					String[] onlyNameF1 = getPath(file1.getPath(), zip1).split("_");
-					String[] onlyNameF2 = getPath(file1.getPath(), zip1).split("_");
-					
-					if (onlyNameF1[0].equals(onlyNameF2[0])) {
-						diff.put(getPath(file1.getPath(), zip1), SAME);
-						//diff.put(getPath(file1.getPath(), zip1), (new DiffForJar(file1.getPath(), file2.getPath()).generateHTML("layout")));
-						FileUtils.writeStringToFile(new File("target/" + getPath(file1.getPath(), zip1) + "-diff.html"), (new DiffForJar(file1.getPath(), file2.getPath()).generateHTML("layout")));
+			}
+		}
+		
+		for (File file1 : filesInZip1) {
+			if (!(file1.getName().equals(zip1.getName()))) {
+				if (!(file1.isDirectory())) {	
+					if (!diff.containsKey(getPath(file1.getPath(), zip1))) {
+						diff.put(getPath(file1.getPath(), zip1), Status.DELETED);
 					}
-			    }
-			    
-				if (!diff.containsKey(getPath(file1.getPath(), zip1)))
-					diff.put(getPath(file1.getPath(), zip1), DELETED);
+				}
 			}
 		}
 		
 		for (File file2 : filesInZip2) {
-			for (File file1 : filesInZip1) {
-				if (!diff.containsKey(getPath(file2.getPath(), zip2)))
-					diff.put(getPath(file2.getPath(), zip2), ADDED);
+			if (!(file2.getName().equals(zip2.getName()))) {
+				if (!(file2.isDirectory())) {
+					if (!diff.containsKey(getPath(file2.getPath(), zip2)))
+						diff.put(getPath(file2.getPath(), zip2), Status.ADDED);
+				}
 			}
 		}
 	}
@@ -92,6 +110,15 @@ public class DiffManager {
 	public String generateHTML() throws Exception
 	{
 		generateDiff();
+		
+		prepared.forEach((file1, file2) -> {
+			try {
+				File file = new File("target/diffs/" + getPath(file1.getPath(), zip1) + "-diff.html");
+				FileUtils.writeStringToFile(file, (new DiffForJar(file1.getPath(), file2.getPath(), file).generateHTML("inner_layout")));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 		
 		HTMLGenerator generator = new HTMLGenerator(diff);
 		return generator.generateHTML("layout.html");

@@ -2,16 +2,12 @@ package org.apodhrad.p2diff;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apodhrad.jdownload.manager.util.UnpackUtils;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 public class DiffForJar {
@@ -26,21 +22,16 @@ public class DiffForJar {
 	 */
 	private String revisedResource;
 	
+	private File newFile;
+	
 	private Map<String, Object> diff = new HashMap<String, Object>();
-	private String htmlDiff = "";
-	
-	private Configuration cfg;
-	
-	final static int SAME = 0;
-	final static int DELETED = 1;
-	final static int ADDED = 2;
-	public String template = "layout.html";
 	
 
-	public DiffForJar(String originalPath, String revisedPath) throws Exception
+	public DiffForJar(String originalPath, String revisedPath, File newFile) throws Exception
 	{
 		this.originalResource = originalPath;
 		this.revisedResource = revisedPath;
+		this.newFile = newFile;
 		
 		ArrayList<File> files1 = extractJar(new File(originalResource).getAbsolutePath() + ".temp", this.originalResource);
 		ArrayList<File> files2 = extractJar(new File(revisedResource).getAbsolutePath() + ".temp", this.revisedResource);
@@ -58,7 +49,6 @@ public class DiffForJar {
 	 */
 	private ArrayList<File> extractJar(String dest, String jar) throws IOException
 	{
-		//UnzipJar uj = new UnzipJar(new File(dest).getPath(), jar);
 		UnpackUtils.unpack(jar, dest);
 		ArrayList<File> store = new ArrayList<File>();
 		Resource.listf(new File(dest).getAbsolutePath(), store);
@@ -79,7 +69,7 @@ public class DiffForJar {
 		return file.getPath().replace(new File(resource).getAbsolutePath() + ".temp/", "");
 	}
 	
-	private Map getDiffFromFiles(ArrayList<File> files1, ArrayList<File> files2) throws Exception
+	private Map<String, Object> getDiffFromFiles(ArrayList<File> files1, ArrayList<File> files2) throws Exception
 	{
 		for (int i=0; i < files1.size(); i++) {
 			for (int y = 0; y < files2.size(); y++) {
@@ -87,15 +77,15 @@ public class DiffForJar {
 					if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
 						if (files1.get(i).isDirectory() || files2.get(y).isDirectory()) {
 							if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
-								diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
+								diff.put(getName(files1.get(i), originalResource), Status.SAME);
 							}
 						} else {
 							DiffForFile dff = new DiffForFile(files1.get(i).getAbsolutePath(), files2.get(y).getAbsolutePath());
 							dff.setTag("span");
 							String generated = dff.generate();
 							
-							if (generated.equals(DiffForFile.NO_CHANGE))
-								diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
+							if (generated.equals(""))
+								diff.put(getName(files1.get(i), originalResource), Status.SAME);
 							else
 								diff.put(getName(files1.get(i), originalResource), dff.generate());
 						}
@@ -104,13 +94,13 @@ public class DiffForJar {
 			}
 
 			if (!diff.containsKey(getName(files1.get(i), originalResource))) {
-				diff.put(getName(files1.get(i), originalResource), DiffForJar.DELETED);
+				diff.put(getName(files1.get(i), originalResource), Status.DELETED);
 			}
 		}
 		
 		for (int y = 0; y < files2.size(); y++) {		
 			if (!diff.containsKey(getName(files2.get(y), revisedResource)))
-				 diff.put(getName(files2.get(y), revisedResource), DiffForJar.ADDED);
+				 diff.put(getName(files2.get(y), revisedResource), Status.ADDED);
 		}
 
 		return diff;
@@ -118,7 +108,7 @@ public class DiffForJar {
 	
 	public String generateHTML(String template) throws IOException, TemplateException
 	{
-		HTMLGenerator generator = new HTMLGenerator(diff);
+		HTMLGenerator generator = new HTMLGenerator(diff, newFile.getPath());
 		return generator.generateHTML(template + ".html");
 	}
 }

@@ -83,22 +83,22 @@ public class DiffForJar {
 	{
 		for (int i=0; i < files1.size(); i++) {
 			for (int y = 0; y < files2.size(); y++) {
-				if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
-					if (files1.get(i).isDirectory() || files2.get(y).isDirectory()) {
-						if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
-							diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
+				if (!(files1.get(i).getName().startsWith(".") || files2.get(y).getName().startsWith("."))) {
+					if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
+						if (files1.get(i).isDirectory() || files2.get(y).isDirectory()) {
+							if (getName(files1.get(i), originalResource).equals(getName(files2.get(y), revisedResource))) {
+								diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
+							}
+						} else {
+							DiffForFile dff = new DiffForFile(files1.get(i).getAbsolutePath(), files2.get(y).getAbsolutePath());
+							dff.setTag("span");
+							String generated = dff.generate();
+							
+							if (generated.equals(DiffForFile.NO_CHANGE))
+								diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
+							else
+								diff.put(getName(files1.get(i), originalResource), dff.generate());
 						}
-					} else {
-						System.out.println(files1.get(i) + " - " + files2.get(y));
-						//DiffForFile dff = new DiffForFile(files1.get(i).getAbsolutePath(), files2.get(y).getAbsolutePath());
-						//dff.setTag("span");
-						//String generated = dff.generate();
-						String generated = "";
-						if (generated.equals(DiffForFile.NO_CHANGE))
-							diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
-						else
-							//diff.put(getName(files1.get(i), originalResource), dff.generate());
-							diff.put(getName(files1.get(i), originalResource), DiffForJar.SAME);
 					}
 				}
 			}

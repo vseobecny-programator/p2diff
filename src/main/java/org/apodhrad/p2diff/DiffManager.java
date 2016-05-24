@@ -59,7 +59,6 @@ public class DiffManager {
 					if (compare(file1, file2)) {
 						
 						if (getPath(file1.getPath(), zip1).equals(getPath(file2.getPath(), zip2))) {
-							System.out.println(getPath(file1.getPath(), zip1) + " - " + getPath(file2.getPath(), zip2));
 							diff.put(getPath(file1.getPath(), zip1), SAME);
 						} else
 							diff.put(getPath(file1.getPath(), zip1), RENAMED);
@@ -70,12 +69,10 @@ public class DiffManager {
 					String[] onlyNameF1 = getPath(file1.getPath(), zip1).split("_");
 					String[] onlyNameF2 = getPath(file1.getPath(), zip1).split("_");
 					
-					System.out.println(onlyNameF1[0] + " - " + onlyNameF2[0]);
-					
 					if (onlyNameF1[0].equals(onlyNameF2[0])) {
-						//diff.put(getPath(file1.getPath(), zip1), SAME);
-						diff.put(getPath(file1.getPath(), zip1), (new DiffForJar(file1.getPath(), file2.getPath()).generateHTML("layout")));
-						//FileUtils.writeStringToFile(new File("target/" + getPath(file1.getPath(), zip1) + "-diff.html"), (new DiffForJar(file1.getPath(), file2.getPath()).generateHTML("layout")));
+						diff.put(getPath(file1.getPath(), zip1), SAME);
+						//diff.put(getPath(file1.getPath(), zip1), (new DiffForJar(file1.getPath(), file2.getPath()).generateHTML("layout")));
+						FileUtils.writeStringToFile(new File("target/" + getPath(file1.getPath(), zip1) + "-diff.html"), (new DiffForJar(file1.getPath(), file2.getPath()).generateHTML("layout")));
 					}
 			    }
 			    

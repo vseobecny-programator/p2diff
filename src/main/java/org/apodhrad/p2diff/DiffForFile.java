@@ -104,7 +104,12 @@ public class DiffForFile {
 	 */
 	public String generate() throws Exception
 	{
-		Patch patch = DiffUtils.diff(originalLines, revisedLines);
+		Patch patch = null;
+		try {
+		patch = DiffUtils.diff(originalLines, revisedLines);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		if (!originalLines.equals(revisedLines)) {
 		

@@ -64,11 +64,24 @@ public class DiffForJar {
 		return map;
 	}
 	
+	/**
+	 * Converts name so it will be the same whatever origin it comes from
+	 * @param file
+	 * @param resource Origin
+	 * @return
+	 */
 	private String getName(File file, String resource)
 	{
 		return file.getPath().replace(new File(resource).getAbsolutePath() + ".temp/", "");
 	}
 	
+	/**
+	 * Generates diff as a map for two JAR files
+	 * @param files1
+	 * @param files2
+	 * @return
+	 * @throws Exception
+	 */
 	private Map<String, Object> getDiffFromFiles(ArrayList<File> files1, ArrayList<File> files2) throws Exception
 	{
 		for (int i=0; i < files1.size(); i++) {
@@ -106,6 +119,13 @@ public class DiffForJar {
 		return diff;
 	}
 	
+	/**
+	 * Generate HTML and return it
+	 * @param template
+	 * @return
+	 * @throws IOException
+	 * @throws TemplateException
+	 */
 	public String generateHTML(String template) throws IOException, TemplateException
 	{
 		HTMLGenerator generator = new HTMLGenerator(diff, newFile.getPath());

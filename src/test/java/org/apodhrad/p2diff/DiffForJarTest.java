@@ -1,48 +1,29 @@
 package org.apodhrad.p2diff;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
-import org.apodhrad.jdownload.manager.JDownloadManager;
-import org.apodhrad.jdownload.manager.hash.MD5Hash;
 import org.junit.Test;
 
-import freemarker.template.TemplateException;
-import net.lingala.zip4j.core.ZipFile;
+import org.junit.*;
 
 public class DiffForJarTest {
-	@Test
-	public void test() throws Exception
-	{
-		/*
-		JDownloadManager jdm = new JDownloadManager();
-		
-		File zip1 = jdm.download("http://download.jboss.org/jbosstools/mars/development/updates/integration-stack/jbosstools-integration-stack-4.3.0.Beta1-earlyaccess.zip", new File("target/beta"), true, new MD5Hash("51d16f5daf6aab209a9f3fc7d4ce41c4"));
-		File zip2 = jdm.download("http://download.jboss.org/jbosstools/mars/stable/updates/integration-stack/jbosstools-integration-stack-4.3.0.Final.zip", new File("target/final"), true, new MD5Hash("85a2a5079de5e1525872e2537b9eb8e6"));
 	
-		ArrayList<File> filesInZip1 = new ArrayList<File>();
-		ArrayList<File> filesInZip2 = new ArrayList<File>();;
+	@Test
+	public void generatingTest() throws Exception
+	{
+		File target = new File("target/dfjtest.html");
 		
-		Resource.listf(zip1.getParent(), filesInZip1);
-		Resource.listf(zip2.getParent(), filesInZip2);
+		DiffForJar dfj = new DiffForJar(
+				new File(getClass().getResource("/small_package.jar").getFile()).getPath(), 
+				new File(getClass().getResource("/small_package2.jar").getFile()).getPath(), 
+				target
+		);
 		
-		System.out.println("test");
+		String expected = FileUtils.readFileToString(new File(getClass().getResource("/dfjtest_expected.html").getFile()));
+		String actual = dfj.generateHTML("inner_layout");
+		FileUtils.writeStringToFile(target, actual);
 		
-		for (File x : filesInZip1) {
-			for (File y : filesInZip2) {
-				String[] test = x.getName().split("_");
-				System.out.println(test);
-			}
-		}
-		
-		
-		DiffForJar dfj = new DiffForJar(zip1.getParent() + "/plugins/org.drools.eclipse.source_6.4.0.201601201107.jar", zip2.getParent() + "/plugins/org.drools.eclipse.source_6.4.1.Final-v20160503-1355-B205.jar");
-		ArrayList<String> htmlLines = new ArrayList<String>();
-		htmlLines.add(dfj.generateHTML());
-		
-		FileUtils.writeLines(new File("target/diff.html"), htmlLines);*/
+		//Assert.assertEquals(expected, actual);
 	}
 }

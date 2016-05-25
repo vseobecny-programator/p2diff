@@ -1,0 +1,75 @@
+table {
+	width: 100%;
+}
+
+form p {
+	margin: 30px;
+	float: left;
+}
+
+.clear {
+	clear: both;
+}
+
+tr {
+	color: white;
+}
+
+td {
+	width: 50%;
+	padding: 10px;
+}
+
+td a {
+	float: right;
+	font-weight: bold;
+	color: #16a085;
+	text-decoration: none;
+}
+
+tr.info {
+	background-color: #2980b9;
+}
+
+tr.deleted {
+	background-color: #e74c3c;
+}
+
+tr.added {
+	background-color: #27ae60;
+}
+
+tr.range {
+	background-color: #800080;
+}
+
+tr.same {
+	background-color: #ecf0f1;
+	color: black !important;
+}
+
+tr.diff {
+	background-color: #ecf0f1;
+	color: black !important;
+}
+
+pre * {
+	background-color: transparent !important;
+	padding: 0;
+}
+
+pre .range {
+	color: #800080;
+}
+
+pre .info {
+	color: #2980b9;
+}
+
+pre .deleted {
+	color: #e74c3c;
+}
+
+pre .added {
+	color: #27ae60;
+}

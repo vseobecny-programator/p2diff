@@ -43,8 +43,6 @@ public class DiffForFile {
 	private Configuration cfg;
 	public String template = "hidden.html";
 	
-	static final String NO_CHANGE = "";
-	
 	/**
 	 * Assign paths and load files
 	 * @param originalPath
@@ -59,12 +57,10 @@ public class DiffForFile {
 		
 		originalLines = FileUtils.readLines(new File(originalPath));
 		revisedLines = FileUtils.readLines(new File(revisedPath));
-		
-		//System.out.println(originalPath);
 	}
 	
 	/**
-	 * Převede Convert Diff to HTML
+	 * Convert Diff to HTML
 	 * @param unifiedDiff
 	 * @return
 	 */
@@ -105,6 +101,7 @@ public class DiffForFile {
 	public String generate() throws Exception
 	{
 		Patch patch = null;
+		
 		try {
 		patch = DiffUtils.diff(originalLines, revisedLines);
 		} catch (Exception e) {
@@ -133,14 +130,14 @@ public class DiffForFile {
 			return sw.toString();
 		}
 		
-		return DiffForFile.NO_CHANGE;
+		return "";
 	}
 	
 	private void configurateTemplateSystem() throws IOException
 	{
 		cfg = new Configuration(Configuration.VERSION_2_3_22);
 		cfg.setDefaultEncoding("UTF-8");
-		cfg.setDirectoryForTemplateLoading(new File(Resource.getResource(".").getFile()));
+		cfg.setClassForTemplateLoading(this.getClass(), "/templates");
 	}
 	
 	//// SETTERS AND GETTERS

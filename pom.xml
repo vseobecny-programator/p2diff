@@ -3,52 +3,76 @@
   <groupId>com.apodhrad.p2diff</groupId>
   <artifactId>p2diff</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-
+  
   <repositories>
     <repository>
       <id>bintray-apodhrad</id>
       <url>https://dl.bintray.com/apodhrad/maven/</url>
       <snapshots>
-	<enabled>true</enabled>
+        <enabled>true</enabled>
       </snapshots>
       <releases>
-	<enabled>true</enabled>
+        <enabled>true</enabled>
       </releases>
     </repository>
   </repositories>
-
+  
   <build>
     <plugins>
       <plugin>
-	<artifactId>maven-compiler-plugin</artifactId>
-	<configuration>
-	  <source>1.8</source>
-	  <target>1.8</target>
-	</configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.apodhrad.p2diff.Diff</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
       </plugin>
       <plugin>
-	<groupId>org.jacoco</groupId>
-	<artifactId>jacoco-maven-plugin</artifactId>
-	<version>0.7.5.201505241946</version>
-	<executions>
-	  <execution>
-	    <id>jacoco-initialize</id>
-	    <goals>
-	      <goal>prepare-agent</goal>
-	    </goals>
-	  </execution>
-	  <execution>
-	    <id>jacoco-site</id>
-	    <phase>test</phase>
-	    <goals>
-	      <goal>report</goal>
-	    </goals>
-	  </execution>
-	</executions>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.5.201505241946</version>
+        <executions>
+          <execution>
+            <id>jacoco-initialize</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-site</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
-
+  
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
@@ -69,6 +93,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>net.lingala.zip4j</groupId>
@@ -96,5 +121,5 @@
       <version>19.0</version>
     </dependency>
   </dependencies>
-
+  
 </project>

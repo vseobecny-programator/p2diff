@@ -6,7 +6,12 @@ import java.util.ArrayList;
 
 class Resource {
 	public static URL getResource(String path) {
-		return DiffForFile.class.getClassLoader().getResource(path);
+		return new Resource().getFile(path);
+	}
+	
+	public URL getFile(String path)
+	{
+		return getClass().getClassLoader().getResource(path);
 	}
 	
 	

@@ -1,0 +1,67 @@
+table {
+	width: 100%;
+}
+
+form {
+	margin: 30px;
+}
+
+td {
+	width: 50%;
+	padding: 10px;
+	color: white;
+}
+
+td a {
+	float: right;
+	font-weight: bold;
+	color: #16a085;
+	text-decoration: none;
+}
+
+.info {
+	background-color: #2980b9;
+}
+
+.deleted {
+	background-color: #e74c3c;
+}
+
+.added {
+	background-color: #27ae60;
+}
+
+.range {
+	background-color: #800080;
+}
+
+.same {
+	background-color: #eeeeee;
+	color: black !important;
+}
+
+.renamed td {
+	background-color: #eeeeee;
+	color: black !important;
+}
+
+pre * {
+	background-color: transparent !important;
+	padding: 0;
+}
+
+pre .range {
+	color: #800080;
+}
+
+pre .info {
+	color: #2980b9;
+}
+
+pre .deleted {
+	color: #e74c3c;
+}
+
+pre .added {
+	color: #27ae60;
+}

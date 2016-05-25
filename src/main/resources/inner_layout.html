@@ -15,17 +15,19 @@
 		<table>
 			<#list diff?keys as key>
 				<#if diff[key] == "SAME">
-			    	<tr><td class="same">${key}</td></tr>
+			    	<tr class="same"><td>${key}</td></tr>
 			    <#elseif diff[key] == "DELETED">
-			    	<tr><td class="deleted">${key}</td></tr>
+			    	<tr class="deleted"><td>${key}</td></tr>
 				<#elseif diff[key] == "ADDED">
-					<tr><td class="added">${key}</td></tr>
+					<tr class="added"><td>${key}</td></tr>
 				<#elseif diff[key] == "RENAMED">
-					<tr><td class="renamed">${key} (RENAMED)</td></tr>
+					<tr class="renamed"><td>${key} (RENAMED)</td></tr>
 				<#else>
-					<tr><td class="hidden"><pre>${diff[key]}</pre></td></tr>
+					<tr class="hidden"><td><pre>${diff[key]}</pre></td></tr>
 				</#if>
 			</#list>
 		</table>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 	</body>
 </html>

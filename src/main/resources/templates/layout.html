@@ -14,6 +14,10 @@
 		<div class="filtering">
 			<form>
 				<p>
+					<label for="search">
+					<input type="text" id="search" name="search" placeholder="Search">
+				</p>
+				<p>
 					<label for="same-hide">Show files, that hasn't changed</label>
 					<input type="checkbox" id="same-hide" name="same-hide" checked>
 				</p>
@@ -38,6 +42,11 @@
 			</form>
 		</div>
 		<table>
+			<tr>
+				<th>New version</th>
+				<th>Old version</th>
+				<th>Action</th>
+			</tr>
 			<#list diff?keys as key>
 				<#if diff[key] == "SAME">
 			    	<tr class="same"><td colspan="3">${key}</td></tr>

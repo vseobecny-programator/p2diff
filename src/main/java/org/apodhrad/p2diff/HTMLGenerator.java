@@ -14,7 +14,6 @@ public class HTMLGenerator {
 	
 	private Map<String, Object> diff = new HashMap<String, Object>();
 	private Configuration cfg;
-	private String htmlDiff;
 	private String filename;
 	
 	HTMLGenerator(Map<String, Object> diff)
@@ -46,6 +45,6 @@ public class HTMLGenerator {
 	{
 		cfg = new Configuration(Configuration.VERSION_2_3_22);
 		cfg.setDefaultEncoding("UTF-8");
-		cfg.setDirectoryForTemplateLoading(new File(this.getClass().getResource("/").getFile()));
+		cfg.setClassForTemplateLoading(this.getClass(), "/templates");
 	}
 }

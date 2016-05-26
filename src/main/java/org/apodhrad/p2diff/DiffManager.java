@@ -32,21 +32,24 @@ public class DiffManager {
 	
 	private Map<String, Object> diff = new HashMap<String, Object>();
 	
+	private File target;
+	
 	/**
 	 * Map of files which are prepared for a HTML conversion
 	 */
 	private Map<File, File> prepared = new HashMap<File, File>();
 	
-	DiffManager(File zip1, File zip2)
+	DiffManager(File zip1, File zip2, File target)
 	{
-		this(zip1, zip2, "(.*)");
+		this(zip1, zip2, "(.*)", target);
 	}
 	
-	DiffManager(File zip1, File zip2, String filter)
+	DiffManager(File zip1, File zip2, String filter, File target)
 	{
 		this.zip1 = zip1;
 		this.zip2 = zip2;
 		this.filter = filter;
+		this.target = target;
 	}
 	
 	/**
@@ -85,8 +88,7 @@ public class DiffManager {
 		ArrayList<File> filesInZip2 = new ArrayList<File>();;
 		
 		Resource.listf(zip1.getPath(), filesInZip1);
-		Resource.listf(zip2.getPath(), filesInZip2);
-		
+		Resource.listf(zip2.getPath(), filesInZip2);	
 
 		for (File file1 : filesInZip1) {
 			for (File file2 : filesInZip2) {
@@ -152,7 +154,7 @@ public class DiffManager {
 		
 		prepared.forEach((file1, file2) -> {
 			try {
-				File file = new File("target/diffs/" + getPath(file1.getPath(), zip1) + "-diff.html");
+				File file = new File(target.getParent() + "/" + getPath(file1.getPath(), zip1) + "-diff.html");
 				FileUtils.writeStringToFile(file, (new DiffForJar(file1.getPath(), file2.getPath(), file).generateHTML("inner_layout")));
 			} catch (Exception e) {
 				e.printStackTrace();

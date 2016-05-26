@@ -32,7 +32,8 @@ public class DiffManagerTest {
 		//File zip2 = jdm.download("http://java-sourcecode.weebly.com/uploads/7/3/2/6/7326864/library_ma218756952010.zip", new File("target/beta"), true);
 		//File zip1 = jdm.download("http://java-sourcecode.weebly.com/uploads/7/3/2/6/7326864/memory_mon2191991142010.zip", new File("target/final"), true);
 		
-		DiffManager dm = new DiffManager(unpackZip1, unpackZip2, "(.*)kie(.*)");
-		FileUtils.writeStringToFile(new File("target/diffs/diff.html"), dm.generateHTML());
+		File diff = new File("target/diffs/diff.html");
+		DiffManager dm = new DiffManager(unpackZip1, unpackZip2, "(.*)kie(.*)", diff);
+		FileUtils.writeStringToFile(diff, dm.generateHTML());
 	}
 }

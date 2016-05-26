@@ -1,8 +1,4 @@
-# P2 Diff Tool
-
-A tool for generating a diff overview of 2 update sites
-
-# Usage
+Usage:
 
 1.) ... http://url.to.original.file.zip http://url.to.original.file2.zip . http://url.to.revised.file.zip ...
     --filter=<regex>

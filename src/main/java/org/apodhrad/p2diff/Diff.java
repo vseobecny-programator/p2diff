@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -55,13 +56,27 @@ public class Diff {
 				for (URL url : revisedUrls) {
 					UnpackUtils.unpack(jdm.download(url.getFile(), extract2), unpackZip2);
 				}
-	
+				
+				System.out.println(unpackZip2.getAbsolutePath());
+				
 				DiffManager dm = new DiffManager(unpackZip1, unpackZip2, filter, target);
 				FileUtils.writeStringToFile(target, dm.generateHTML());
+				
+				InputStream css = Diff.class.getResourceAsStream("/css/style.css");
+				InputStream js = Diff.class.getResourceAsStream("/js/script.js");
+				
+				FileUtils.writeStringToFile(new File(target.getParent() + "/css/style.css"), readInputStream(css));
+				FileUtils.writeStringToFile(new File(target.getParent() + "/js/script.js"), readInputStream(js));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static String readInputStream(InputStream is) throws IOException {
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(is, writer);
+		return writer.toString();
 	}
 	
 	
